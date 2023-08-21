@@ -1,0 +1,289 @@
+﻿@model Tuple<List<Homer_MVC.Models.solicitud_lista>>
+@{
+    ViewBag.Title = "Index";
+    var time = DateTime.Now.ToString("HHmmss");
+    string cat = ViewBag.x1;
+
+    string titulo = "Solicitudes";
+    string color = "text-primary";
+    string colorbtn = "btn-primary";
+    string colormodal = "hmodal-primary";
+    string colorbg = "bg-primary";
+    if (cat == "H")
+    {
+        titulo = "Historial de solicitudes.";
+        color = "text-primary";
+        colorbtn = "btn-primary";
+        colormodal = "hmodal-primary";
+        colorbg = "bg-primary";
+
+    }
+    else if (cat == "M")
+    {
+        titulo = "Mis solicitudes.";
+        color = "text-info";
+        colorbtn = "btn-info";
+        colormodal = "hmodal-info";
+        colorbg = "bg-info";
+
+    }
+    else if (cat == "P")
+    {
+        titulo = "Solicitudes pendientes.";
+        color = "text-warning";
+        colorbtn = "btn-warning";
+        colormodal = "hmodal-warning";
+        colorbg = "bg-warning";
+
+    }
+}
+<div class="content animate-panel" >
+    <div class="row">
+        <div class="col-lg-12">
+        <h3 class="@color">@titulo</h3>
+            <hr />
+            <div class="hpanel">
+                <div class="panel-heading">
+                    <div class="panel-tools">
+                        <a class="showhide"><i class="fa fa-chevron-up"></i></a>
+                    </div>
+                    <i class="pe pe-7s-edit"></i> Filtro de b&uacute;squeda
+                </div>
+                <div class="panel-body" style="zoom:80%;">
+                    <div class="col-lg-6">
+                        <div>
+
+                            <h5 class="col-sm-4">Rango de fechas:</h5>
+                            <div class="col-sm-8">
+                                <div class="input-daterange input-group fechaPick" id="pickerFechas">
+                                    <input type="text" class="form-control date" name="dateDesde" id="dateDesde" placeholder="Desde" value="" />
+                                    <span class="input-group-addon">hasta</span>
+                                    <input type="text" class="form-control date" name="dateHasta" id="dateHasta" placeholder="Hasta" value="" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-t-md" style="padding-top:25px !important;">
+                            <h5 class="col-sm-4">Datos1</h5>
+                            <div class="col-sm-8"><input type="text" class="form-control" id="txtPoliza" value="" onkeypress="return soloNumeros(event)" /></div>
+                        </div>
+                        <div class="m-t-md" style="padding-top:25px !important;">
+                            <h5 class="col-sm-4">Datos2<small id="infRut" class="text-danger" hidden>(Rut Invalido)</small></h5>
+                            <div class="col-sm-8"><input type="text" class="form-control" id="txtRut" value="" oninput="checkRut(this)" /></div>
+                        </div>
+                        <div class="m-t-md" style="padding-top:25px !important;">
+                            <h5 class="col-sm-4">Datos3</h5>
+                            <div class="col-sm-8"><input type="text" class="form-control" id="txtFolio" value="" onkeypress="return soloNumeros(event)" /></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-footer" style="zoom:80%; text-align:right;">
+                    <button class="btn btn-md @colorbtn" onclick="buscarSol()"><i class="fa fa-search"></i> Buscar</button>
+                    <button class="btn btn-md btn-default"><i class="fa fa-refresh"></i> Limpiar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-lg-12" id="listado_solicitudes">
+
+            <div class="hpanel">
+                <div class="panel-heading">
+                    <div class="panel-tools">
+                        <a class="showhide"><i class="fa fa-chevron-up"></i></a>
+                    </div>
+                    <i class="pe pe-7s-edit"></i> Listado de Solicitudes
+                </div>
+                <div class="panel-body">
+                    <p><button class="btn btn-xs @colorbtn"><i class="fa fa-file-excel-o"></i> Exportar Excel</button></p>
+                    <div class="table-responsive">
+                        <table id="tbl_solicitud" class="table-striped table table-bordered dtbl" cellspacing="0">
+                            <thead >
+                                <tr>
+                                    <th>#</th>
+                                    <th>Empresa/Cliente</th>
+                                    <th>RUT</th>
+                                    <th>Numero</th>
+                                    <th>Estado</th>
+                                    <th>Nivel</th>
+                                    <th>Creador</th>
+                                    <th>Asinado</th>
+                                    <th>Fecha</th>
+                                    <th>Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int count = 1;
+                                    foreach (var item in Model.Item1)
+                                    {
+                                        string nombCreador = string.Concat(item.usu_creador.USU_NOMBRE);
+                                        string nombAsig = string.Concat(item.usu_asignado.USU_NOMBRE);
+                                        <tr>
+                                            <td>@count</td>
+                                            <td>@item.datacliente.CLIENTE_NOMBRE</td>
+                                            <td>@item.datacliente.CLIENTE_RUT</td>
+                                            <td>N° @item.datasol.COTIZACION.numero</td>
+                                            <td>@item.datasol.ESTADOS.Nombre</td>
+                                            <td>@item.lastNiv.FLUJOS_NIVELES.num_nivel</td>
+                                            <td>@nombCreador</td>
+                                            <td>@nombAsig</td>
+                                            <td>@item.datasol.fecha_creacion.ToShortDateString()</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-primary btn-sm" type="button" title="Movimientos" onclick="vermov(@item.datasol.id)"><i class="pe pe-7s-photo-gallery"></i></button>
+                                                    <button class="btn btn-primary2 btn-sm" type="button" title="Ver" onclick="ver(@item.datasol.id)"><i class="pe pe-7s-search"></i></button>
+                                                    <button class="btn btn-info btn-sm" type="button" title="Continuar" onclick="continuar(@item.datasol.id)"><i class="pe pe-7s-play"></i></button>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                        count++;
+                                    }
+                                }
+
+                            </tbody>
+                        </table>
+                        <div class="modal fade @colormodal" id="modal_btn" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-lg" id="modal_content">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Styles {
+@Styles.Render("~/bundles/datatables/css")
+<link rel="stylesheet" href="~/Scripts/externos/css/sweetalert.min.css">
+<style>
+    div.datepicker-dropdown {
+        zoom: 80%;
+    }
+
+</style>
+
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/datatables/js")
+    @Scripts.Render("~/bundles/datatablesBootstrap/js")
+    @Scripts.Render("~/bundles/datatablesPlugins/js")
+    @Scripts.Render("~/bundles/moment/js")
+    @Scripts.Render("~/bundles/datepicker/js")
+    <script src="~/Scripts/externos/js/sweetalert.min.js"></script>
+<script src="~/Scripts/externos/js/moment.min.js"></script>
+<script src="~/Scripts/funciones.js?@time"></script>
+
+
+    <script type="text/javascript">
+
+        $(function () {
+            $('#pickerFechas').datepicker({
+                language: 'es-ES',
+                todayHighlight: true,
+                weekStart: 1,
+                autoclose: true,
+                todayBtn: true,
+                format: "dd/mm/yyyy"
+            });
+            $('#tbl_solicitud').dataTable();
+        });
+
+        function buscarSol() {
+            var desde = $("#dateDesde").val();
+            var hasta = $("#dateHasta").val();
+
+            if (!desde || !hasta) {
+                alerta("¡Mensaje!", "Debe ingresar algun campo de búsqueda.", "warning");
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: '/Solicitudes/Listar',
+                    data: { desde: desde, hasta: hasta },
+                    dataType: "html",
+                    async: false,
+                    cache: false,
+                    success: function (html) {
+                        $("#listado_solicitudes").html('');
+                        $("#listado_solicitudes").html(html);
+                    }
+                });
+            }
+        }
+
+        function vermov(id) {
+
+            if (id) {
+                $.ajax({
+                    type: "GET",
+                    url: '/Solicitudes/vermov',
+                    data: { x1: id, x2:'@colorbtn'},
+                    dataType: "html",
+                    async: false,
+                    cache: false,
+                    success: function (html) {
+                        $("#modal_content").html('');
+                        $("#modal_content").html(html);
+                        $("#modal_btn").modal("show");
+                    }
+                });
+            }
+
+        }
+
+        function ver(id) {
+
+            if (id) {
+                $.ajax({
+                    type: "GET",
+                    url: '/Solicitudes/ver',
+                    data: { x1: id, x2:'@colorbtn'},
+                    dataType: "html",
+                    async: false,
+                    cache: false,
+                    success: function (html) {
+                        $("#modal_content").html('');
+                        $("#modal_content").html(html);
+                        $("#modal_btn").modal("show");
+                    }
+                });
+            }
+
+        }
+
+        function continuar(id) {
+
+            if (id) {
+                $.ajax({
+                    type: "GET",
+                    url: '/Solicitudes/continuar',
+                    data: { x1: id, x2: '@colorbtn' },
+                    dataType: "html",
+                    async: false,
+                    cache: false,
+                    success: function (html) {
+                        $("#modal_content").html('');
+                        $("#modal_content").html(html);
+                        $("#modal_btn").modal("show");
+                    }
+                });
+            }
+
+        }
+
+        function alerta(titulo, texto, tipo) {
+            swal({
+                title: titulo,
+                text: texto,
+                type: tipo
+            });
+        }
+
+
+    </script>
+}

@@ -1,0 +1,123 @@
+﻿@{
+    ViewBag.Title = "Inicio";
+    var time = DateTime.Now.ToString("HHmmss");
+
+}
+
+<div class="content animate-panel">
+    <div class="row">
+        <div class="col-lg-12 text-center m-t-md">
+            <h2>
+                Bienvenidos a WorkFlow | Zubimed
+            </h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="hpanel">
+                @*<div class="panel-heading">
+                    <div class="panel-tools">
+                        <a class="showhide"><i class="fa fa-chevron-up"></i></a>
+                    </div>
+                    Estadísticas
+                </div>*@
+                <div class="panel-body">
+
+
+
+                    <div class="row">
+                        
+                       
+                        <div class="col-md-3">
+                            <a href="@Url.Action("Index", "Solicitudes", new { x1 = "H" }) ">
+                                <div class="hpanel hbgnavyblue">
+                                    <div class="panel-body">
+                                        <div class="text-center">
+                                            <h4 class="m-b-xs"><b>Historial</b></h4>
+                                            <div class="m">
+                                                <p class="text-big font-light">
+                                                    <i class="pe-7s-check"></i> 7
+                                                </p>
+                                            </div>
+                                            <p class="small">
+                                                Listado de solicitudes historicas
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="@Url.Action("Index", "Solicitudes", new { x1 = "M" }) ">
+                                <div class="hpanel hbgblue">
+                                    <div class="panel-body">
+                                        <div class="text-center">
+                                            <h4 class="m-b-xs"><b>Mis Solicitudes</b></h4>
+                                            <div class="m">
+                                                <p class="text-big font-light">
+                                                    <i class="pe-7s-check"></i> 7
+                                                </p>
+                                            </div>
+                                            <p class="small">
+                                                Listado de solicitudes iniciadas
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="col-md-3">
+                            <a href="@Url.Action("Index", "Solicitudes", new { x1 = "P" }) ">
+                                <div class="hpanel hbgyellow">
+                                    <div class="panel-body">
+                                        <div class="text-center">
+                                            <h4 class="m-b-xs"><b>Pendientes</b></h4>
+                                            <div class="m">
+                                                <p class="text-big font-light">
+                                                    <i class="pe-7s-check"></i> 7
+                                                </p>
+                                            </div>
+                                            <p class="small">
+                                                Listado de solicitudes pendientes de aprobacion
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+}
+
+@section Scripts {
+    <script src="~/Scripts/funciones.js?@time"></script>
+
+
+    <script type="text/javascript">
+        $(function () {
+        });
+
+        function ListarSol(t) {
+            $.ajax({
+                type: "GET",
+                url: '/Solicitudes/Listar',
+                data: { desde: desde, hasta: hasta },
+                dataType: "html",
+                async: false,
+                cache: false,
+                success: function (html) {
+                    $("#listado_solicitudes").html('');
+                    $("#listado_solicitudes").html(html);
+                }
+            });
+        }
+    </script>
+}

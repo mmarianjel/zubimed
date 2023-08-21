@@ -1,0 +1,343 @@
+﻿@model Homer_MVC.Models.SOLICITUDES
+
+@{
+    Layout = "~/Views/Shared/_Layout_null.cshtml";
+    string pdfNombre = "pdfdemo.pdf";
+    string pdf = "pdfdemo.pdf";
+    var colortext = "text-primary";
+    var colorbg = "bg-primary";
+    if (ViewBag.colorbtn == "btn-primary")
+    {
+        colortext = "text-primary";
+        colorbg = "bg-primary";
+    }
+    else if (ViewBag.colorbtn == "btn-info")
+    {
+        colortext = "text-info";
+        colorbg = "bg-info";
+    }
+    else if (ViewBag.colorbtn == "btn-warning")
+    {
+        colortext = "text-warning";
+        colorbg = "bg-warning";
+    }
+}
+
+
+<div class="modal-content">
+    <div class="color-line"></div>
+    @*<div class="modal-header">
+            <h4 class="modal-title">Vista</h4>
+            <small class="font-bold">Previsualizacion de la solicitud.</small>
+        </div>*@
+    <div class="modal-body">
+        <div class="row">
+            <div class="hpanel">
+                <div class="panel-heading hbuilt">
+                    <div class="panel-tools">
+                        <a class="showhide"><i class="fa fa-chevron-up @colortext"></i></a>
+                    </div>
+                    <h4 class="@colortext">
+                        <i class="pe pe-7s-monitor"></i> Preview Archivos<br /><small id="label_view">@pdfNombre</small>
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12" id="imgView" style="text-align:center;">
+                            @if (pdfNombre != "NA")
+                            {
+                                <object data="~/Uploads/@pdf" type="application/pdf" width="100%" height="400" id="pdfView">
+                                    alt : <a href="~/Uploads/@pdf">@pdfNombre</a>
+                                </object>
+                            }
+                            else
+                            {
+                                <i class="fa fa-file-pdf-o" style="font-size:50px; text-align:center;"></i>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="hpanel">
+                <div class="panel-heading hbuilt">
+                    <div class="panel-tools">
+                        <a class="showhide"><i class="fa fa-chevron-up @colortext"></i></a>
+                    </div>
+                    <h4 class="@colortext">
+                        <i class="pe pe-7s-paperclip"></i> Listado de Adjuntos
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="row m-b-md">
+                        <div class="col-sm-6">
+                            <input type="text" maxlength="20" class="form-control" name="adjDescripcion" id="adjDescripcion" placeholder="Descripcion..." />
+                        </div>
+                        <div class="col-sm-3">
+                            <input type="file" name="fileOtro" id="fileOtro" class="inputfile" data-sol="@Model.id" />
+                            <label for="fileOtro" id="label_fileOtro" title="Subir archivo" class="bg-danger">
+                                <i class="fa fa-cloud-upload"></i>  SUBIR
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <table cellpadding="1" cellspacing="1" class="table table-bordered table-striped">
+                        <thead class="@colortext @colorbg">
+                            <tr>
+                                <th>Tipo Archivo</th>
+                                <th>Nivel</th>
+                                <th>Descripci&oacute;n</th>
+                                <th>Usuario</th>
+                                <th>Fecha Creaci&oacute;n</th>
+                                <th width="10%">Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            @{
+                                foreach (var reg in Model.SOLICITUD_NIVELES)
+                                {
+                                    foreach (var adj in reg.SOLICITUD_NIVEL_ADJUNTO)
+                                    {
+                                        <tr>
+                                            <td>@adj.tipo</td>
+                                            <td>@reg.FLUJOS_NIVELES.num_nivel</td>
+                                            <td>@adj.descripcion</td>
+                                            <td>@reg.USUARIOS.USU_MAIL</td>
+                                            <td>@adj.fecha_alta</td>
+                                            <td>
+                                                <button class="btn @ViewBag.colorbtn btn-sm" type="button" title="Ver"><i class="pe pe-7s-search"></i></button>
+
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="hpanel">
+                <div class="panel-heading hbuilt">
+                    <div class="panel-tools">
+                        <a class="showhide"><i class="fa fa-chevron-up @colortext"></i></a>
+                    </div>
+                    <h4 class="@colortext">
+                        <i class="pe pe-7s-note"></i> Observaciones
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="row m-b-md">
+                        <div class="col-sm-12">
+                            <h5>Observacion de nivel <span id="obs_count">0/1000</span></h5>
+                            <textarea class="form-control txt_count" rows="4" id="observacion" name="observacion" data-strmax="1000" data-count="obs_count" data-text="Observaciones" style="resize:none;"></textarea>
+                        </div>
+                    </div>
+                    <table cellpadding="1" cellspacing="1" class="table table-bordered table-striped">
+                        <thead class="@colortext @colorbg">
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Nivel</th>
+                                <th>Usuario</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var listObs in Model.SOLICITUD_NIVELES.OrderByDescending(x => x.id))
+                                {
+                                    string obs = string.Empty;
+                                    if (!string.IsNullOrEmpty(listObs.observacion))
+                                    {
+                                        obs = listObs.observacion;
+                                    }
+                                    else
+                                    {
+                                        obs = "Sin Comentario";
+                                    }
+
+                                    <tr>
+                                        <td>@listObs.accion</td>
+                                        <td>@listObs.FLUJOS_NIVELES.num_nivel</td>
+                                        <td>@listObs.USUARIOS.USU_MAIL</td>
+                                        <td>@Convert.ToDateTime(listObs.fecha_accion).ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">Comentario: @obs</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary2" data-dismiss="modal">Devolver</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Anular</button>
+            <button type="button" class="btn btn-success" data-dismiss="modal">Aprobar</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+</div>
+<style>
+    .btn-file {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-file input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        background: white;
+        cursor: inherit;
+        display: block;
+    }
+
+    .inputfile {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .inputfile + label {
+        background-color: #1ab394;
+        border-color: #1ab394;
+        color: #FFFFFF;
+        margin-bottom: 5px;
+        border-radius: 3px;
+        display: block;
+        width: 100%;
+        cursor: pointer;
+        padding: 6px 12px;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        border: 1px solid transparent;
+        font-family: inherit;
+        touch-action: manipulation;
+    }
+
+    .inputfile + label:hover {
+        color: #fff;
+        background-color: #18a689;
+        border-color: #18a689;
+    }
+</style>
+<script>
+    $(document).on("change", '.inputfile', function (e) {
+        var id = $(this).attr('id');
+        var id_sol = $(this).attr('data-sol');
+        var tipo = "";
+        var descripcion = "";
+        if (id == "fileOtro") {
+            tipo = "Otro";
+            descripcion = $("#adjDescripcion").val().trim();
+        }
+
+        if (id == "fileOtro" && descripcion.length <= 0) {
+            alerta("¡Mensaje!", "Debe especificar una descripción.", "warning");
+        } else {
+            var files = $(this)[0].files;
+            var file = {};
+            var err = '';
+            var sizeT = 0;
+            var cantI = 0;
+            if (files.length > 0) {
+
+                var formData = new FormData();
+                formData.append('tipo', tipo);
+                formData.append('descripcion', descripcion);
+                formData.append('idSol', id_sol);
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    var size = file.size;
+                    var sizekb = (size / 1024);
+                    //alert(size);
+
+                    var sizemb = (sizekb / 1024);
+                    var filenombre = file.name;
+                    var lfnombre = filenombre.length;
+
+                    if (lfnombre <= 50 && sizemb <= 5 && size > 0) {
+                        formData.append(id, file);
+                        sizeT = (sizeT + size);
+                        cantI++;
+
+                        var fileName = '';
+                        fileName = e.target.value.split('\\').pop();
+                        if (fileName) {
+                            $("#label_" + id).html('<i class="fa fa-cloud-upload"></i>  Subiendo... <img src="../Images/load_2.gif" width="10" />');
+                            $("#label_" + id).attr('title', fileName);
+                        }
+
+                    } else {
+                        err += filenombre + ",";
+                    }
+
+                }
+                err.trim();
+
+                if (err != "") {
+                    err = err.slice(0, -1);
+                }
+
+                if (cantI >= 1) {
+                    if (sizeT <= 5242880) {
+                        $.ajax({
+                            type: 'post',
+                            url: '/Solicitudes/upld_adjunto',
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            async: false,
+                            cache: false,
+                            beforeSend: function () {
+                                var fileName = '';
+                                fileName = e.target.value.split('\\').pop();
+                                if (fileName) {
+                                    $("#label_" + id).html('<i class="fa fa-cloud-upload"></i>  Subiendo... <img src="../Images/load_2.gif" width="10" />');
+                                    $("#label_" + id).attr('title', fileName);
+                                }
+                            },
+                            success: function (response) {
+                                console.log(response);
+                            }
+                        });
+                    } else {
+                        alerta("¡Mensaje!", "El tamaño de los archivos supera los 5Mb.", "warning");
+                    }
+                } else {
+                    alerta("¡Mensaje!", "Los siguientes archivos no pudieron ser subidos por no cumplir con los parámetros de validación. Recuerde que el nombre no debe exceder los 50 caracteres y el tamaño debe ser inferior a 5Mb.", "warning");
+                }
+            } else {
+                alerta("¡Mensaje!", "No se detecta archivo cargado.", "warning");
+            }
+        }
+
+        $(this).val('');
+
+    });
+</script>
