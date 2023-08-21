@@ -246,3 +246,10 @@ Models/
 Web.config
 Uploads/
 Images/
+Homer_MVC/Web.config
+Homer_MVC/Global.asax
+Homer_MVC/Global.asax.cs
+Homer_MVC/Homer_MVC.csproj
+Homer_MVC/Web.Debug.config
+Homer_MVC/Web.Release.config
+Homer_MVC/packages.config
